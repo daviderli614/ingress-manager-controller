@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ingress-manager-controller
+  name: ingress-manager-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingress-manager-controller
+  template:
+    metadata:
+      labels:
+        app: ingress-manager-controller
+    spec:
+      serviceAccountName: ingress-manager-sa
+      containers:
+        - image: uhub.service.ucloud.cn/liyang01/ingress-manager-controller:v1.1
+          name: ingress-manager-controller

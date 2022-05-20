@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app-1
+  labels:
+    app:  demo-app-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-app-1
+  template:
+    metadata:
+      labels:
+        app: demo-app-1
+    spec:
+      containers:
+        - name: demo-app-1
+          image: uhub.service.ucloud.cn/jenkins_k8s_cicd/echo_nginx:v11
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    "ingress/http": "true"
+    "service/port": "80"
+    "rule/host":    "example.com"
+  name: demo-app-1-svc
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: demo-app-1
