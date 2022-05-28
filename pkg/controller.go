@@ -104,6 +104,11 @@ func (c *controller) syncService(key string) error {
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
+	var host = "example.com"
+	h, ok := service.GetAnnotations()["rule/host"]
+	if ok {
+		host = h
+	}
 	fmt.Println("sync ingress...")
 	if ok && errors.IsNotFound(err) {
 		fmt.Printf("create ingress %s\n", name)
@@ -117,6 +122,14 @@ func (c *controller) syncService(key string) error {
 		fmt.Printf("delete ingress %s\n", name)
 		//delete ingress
 		err := c.client.NetworkingV1().Ingresses(namespaceKey).Delete(context.TODO(), name, v13.DeleteOptions{})
+		if err != nil {
+			return err
+		}
+	} else if ok && ingress.Spec.Rules[0].Host != host {
+		fmt.Printf("update ingress %s\n", name)
+		//update ingress
+		ig := c.constructIngress(service)
+		_, err := c.client.NetworkingV1().Ingresses(namespaceKey).Update(context.TODO(), ig, v13.UpdateOptions{})
 		if err != nil {
 			return err
 		}
